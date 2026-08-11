@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULSE — 診断を、商品にする | No4.DesignClub</title>
+<meta name="description" content="GA4・Googleビジネスプロフィール・口コミを横断して読む診断サービス。数字を見せるだけでなく、なぜ動いたかを特定し、次の一手まで提言する。">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@100;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* pulse-product.html 固有の追加スタイル（styles.cssの既存クラスに相乗り） */
+  .pp-problem { padding: 120px 0; }
+  .pp-problem .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; }
+  .pp-problem .card { border: 1px solid rgba(196,151,74,.18); padding: 28px 24px; }
+  .pp-problem .card .no { font-family: 'Fraunces', serif; font-style: italic; color: var(--gold, #ad7f39); font-size: 1.4rem; margin-bottom: 12px; }
+  .pp-compare { padding: 0 0 120px; }
+  .pp-compare table { width: 100%; border-collapse: collapse; margin-top: 32px; font-size: .92rem; }
+  .pp-compare th, .pp-compare td { padding: 14px 16px; border-bottom: 1px solid rgba(196,151,74,.14); text-align: left; }
+  .pp-compare th { font-weight: 500; opacity: .6; text-transform: uppercase; font-size: .72rem; letter-spacing: .08em; }
+  .pp-compare tr.highlight td { color: var(--gold, #ad7f39); }
+  .pp-steps { padding: 0 0 120px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .pp-steps .step .no { font-family: 'Fraunces', serif; font-style: italic; color: var(--gold, #ad7f39); font-size: 2rem; }
+  .pp-cta { padding: 100px 0; text-align: center; border-top: 1px solid rgba(196,151,74,.18); }
+  .pp-cta .btn-primary { display: inline-block; margin-top: 28px; padding: 16px 40px; border: 1px solid var(--gold, #ad7f39); color: var(--gold, #ad7f39); text-decoration: none; letter-spacing: .1em; transition: all .3s; }
+  .pp-cta .btn-primary:hover { background: var(--gold, #ad7f39); color: #0e0e0e; }
+  .pp-cta .placeholder-note { margin-top: 16px; font-size: .78rem; opacity: .5; }
+  @media (max-width: 768px) {
+    .pp-problem .grid, .pp-steps { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="mark" href="index.html"><img class="mark-icon" src="assets/brand/no4-mark.png" alt="">No<b>4.</b>DesignClub</a>
+  <a class="back" href="category-pulse.html"><span>&#8592;</span> PULSE Overview</a>
+</header>
+
+<section class="cat-hero" id="s-hero">
+  <div class="wrap">
+    <div class="no reveal">PULSE — Product</div>
+    <h1 class="serif reveal">診断を、<br>商品にする。</h1>
+    <p class="tag reveal">GA4・Googleビジネスプロフィール・口コミを横断して読む診断サービス。</p>
+    <p class="fine reveal">数字を見せるだけでは終わらない。なぜ動いたのかを特定し、次の一手まで提言する。</p>
+    <div class="rule reveal"></div>
+  </div>
+</section>
+
+<div class="wrap pp-problem">
+  <div class="reveal">
+    <div class="no" style="font-family:'Fraunces',serif;font-style:italic;color:var(--gold,#ad7f39);">The Problem</div>
+    <h2 class="serif">数字はある。答えがない。</h2>
+  </div>
+  <div class="grid">
+    <div class="card reveal">
+      <div class="no">01</div>
+      <p>GA4・GBP・口コミ、それぞれのツールは数字を見せてくれる。でも「なぜ先月より予約が減ったのか」には誰も答えない。</p>
+    </div>
+    <div class="card reveal">
+      <div class="no">02</div>
+      <p>既存のMEO/SNS分析ツールは「計測」と「自動化（投稿・返信の代行）」止まり。原因を特定し、改善提言まで踏み込むタイプは市場に存在しない。</p>
+    </div>
+    <div class="card reveal">
+      <div class="no">03</div>
+      <p>だからオーナーは、毎月の数字をただ眺めて終わる。何が効いて何が効いていないのか分からないまま、次の施策を勘で決める。</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap pp-steps">
+  <div class="step reveal">
+    <div class="no">01</div>
+    <h3 class="serif">検知</h3>
+    <p>GA4・GBP・口コミサイトのデータを横断して取得。異常なパターンを機械的に検知する（目視の見落としに頼らない）。</p>
+  </div>
+  <div class="step reveal">
+    <div class="no">02</div>
+    <h3 class="serif">原因特定</h3>
+    <p>検知した異常について、確度付きで原因を絞り込む。根拠が薄い推測は「検証キュー」に留め、断定しない——精度と誠実さの両立。</p>
+  </div>
+  <div class="step reveal">
+    <div class="no">03</div>
+    <h3 class="serif">提言</h3>
+    <p>LP・SNS・検証すべき仮説の3方向で、次に何をすべきかを具体的に提示。読んだその日から動ける粒度で出す。</p>
+  </div>
+</div>
+
+<div class="wrap pp-compare">
+  <div class="reveal">
+    <div class="no" style="font-family:'Fraunces',serif;font-style:italic;color:var(--gold,#ad7f39);">Why PULSE</div>
+    <h2 class="serif">「計測」と「診断」は別物。</h2>
+  </div>
+  <table class="reveal">
+    <thead>
+      <tr><th>種別</th><th>できること</th><th>できないこと</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>一般的なMEO/SNS分析ツール</td>
+        <td>順位計測・口コミ一元管理・投稿の自動化</td>
+        <td>「なぜ」の特定・具体的な改善提言</td>
+      </tr>
+      <tr class="highlight">
+        <td>PULSE</td>
+        <td>GA4×GBP×口コミを横断した異常検知・確度付きの原因特定・改善提言</td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<section class="pp-cta">
+  <div class="wrap">
+    <div class="no reveal" style="font-family:'Fraunces',serif;font-style:italic;color:var(--gold,#ad7f39);">Get Started</div>
+    <h2 class="serif reveal">まず、あなたの数字を診断する。</h2>
+    <p class="reveal">実際のレポート形式はサンプルで確認できます。</p>
+    <a class="btn-primary reveal" href="demo/pulse-sample-report.html" target="_blank" rel="noopener">サンプルレポートを見る</a>
+    <a class="placeholder-note reveal" href="https://lin.ee/t08TxwO" target="_blank" rel="noopener" style="text-decoration:underline">LINE公式で相談する &#8594;</a>
+  </div>
+</section>
+
+<section class="back-band">
+  <a class="to-hub" href="category-pulse.html">&#8592; Back to PULSE Overview</a>
+  <a class="to-atelier" href="atelier.html">NO4 ATELIER &#8599;</a>
+</section>
+
+<script src="common.js"></script>
+</body>
+</html>
