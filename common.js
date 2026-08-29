@@ -19,14 +19,23 @@
   var map = {};
   dots.forEach(function(d){ map[d.getAttribute('href').slice(1)] = d; });
   var sections = Object.keys(map).map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  // ratio-based rather than a fixed 0.5 threshold: #s-hero is now a 300vh
+  // scroll spacer (see styles.css .hero-spacer), so it can never fill more
+  // than ~33% of its own bounding box even while it fully covers the
+  // viewport. Tracking the highest-ratio section instead of "first past 50%"
+  // keeps this correct for any section, tall or short.
+  var ratios = {};
   var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(en){
-      if(en.isIntersecting){
-        dots.forEach(function(d){ d.classList.remove('active'); });
-        map[en.target.id].classList.add('active');
-      }
+    entries.forEach(function(en){ ratios[en.target.id] = en.intersectionRatio; });
+    var bestId = null, bestRatio = 0;
+    Object.keys(ratios).forEach(function(id){
+      if(ratios[id] > bestRatio){ bestRatio = ratios[id]; bestId = id; }
     });
-  },{threshold:0.5});
+    if(bestId){
+      dots.forEach(function(d){ d.classList.remove('active'); });
+      map[bestId].classList.add('active');
+    }
+  },{threshold:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]});
   sections.forEach(function(s){ io.observe(s); });
 })();
 

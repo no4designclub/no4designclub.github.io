@@ -22,8 +22,9 @@
   <a href="#s-work-01" class="dot" data-label="01 · Mercer Table"></a>
   <a href="#s-work-02" class="dot" data-label="02 · Create Group"></a>
   <a href="#s-work-03" class="dot" data-label="03 · Tobari"></a>
-  <a href="#s-work-04" class="dot" data-label="04 · Curfew"></a>
-  <a href="#s-work-05" class="dot" data-label="05 · Vigil"></a>
+  <a href="#s-work-04" class="dot" data-label="04 · Latent"></a>
+  <a href="#s-work-05" class="dot" data-label="05 · Curfew"></a>
+  <a href="#s-work-06" class="dot" data-label="06 · Vigil"></a>
 </nav>
 
 <section class="cat-hero" id="s-hero">
@@ -32,7 +33,7 @@
     <h1 class="serif reveal">LP.</h1>
     <p class="tag reveal">世界観を、誌面のように組む。企画・コピー・デザイン・実装まで一貫したエディトリアルLP。</p>
     <p class="fine reveal">検索エンジンだけでなく、AIの回答にも拾われる構造設計にも対応。</p>
-    <div class="count reveal">5 Works</div>
+    <div class="count reveal">6 Works</div>
     <div class="rule reveal"></div>
   </div>
 </section>
@@ -284,15 +285,119 @@
 
     <div class="case-next reveal">
       <div class="lbl">Next Case Study</div>
-      <a href="#s-work-04">Curfew &#8594;</a>
+      <a href="#s-work-04">Latent &#8594;</a>
     </div>
 
   </section>
 
-  <!-- 04 CURFEW -->
-  <section class="work" id="s-work-04">
+  <!-- 04 LATENT — Concept Study, flagship-style case study -->
+  <section class="work case" id="s-work-04">
+
+    <div class="case-hero reveal">
+      <span class="idx">Case Study — 04</span>
+      <h3 class="serif">LATENT</h3>
+      <p class="lead">動画ファイルを一切使わない、リアルタイム生成のインタラクティブ・ヒーロー。AI/テクノロジー領域のコンセプトLPで、「貼った動画が再生される」から「その場で計算されて動き続ける」への切り替えを試した実験作。</p>
+
+      <div class="case-meta">
+        <div><div class="k">Client</div><div class="v">Studio Concept（自主制作）</div></div>
+        <div><div class="k">Industry</div><div class="v">AI / Interactive Web</div></div>
+        <div><div class="k">Scope</div><div class="v">Naming, Brand Direction, WebGL Development</div></div>
+        <div><div class="k">Year</div><div class="v">2026</div></div>
+      </div>
+    </div>
+
+    <div class="case-section reveal">
+      <span class="n serif">01 — 課題</span>
+      <h4 class="serif">「動画を貼るだけ」から抜け出せるか</h4>
+      <p>AI/テック系のプロダクトLPは、ヒーローにストック映像やAI生成のループ動画を敷くのが定番になっている。だが動画には必ずループの継ぎ目が来る——見ている人の動きには一切反応せず、同じ数秒を繰り返すだけの背景に成り下がる。</p>
+      <p>問い直したのは「動画ファイルを一つも使わずに、見るたびに二度と同じ瞬間が訪れないヒーローは作れるか」ということだった。</p>
+    </div>
+
+    <div class="case-section reveal">
+      <span class="n serif">02 — ブランド戦略</span>
+      <h4 class="serif">「潜在空間」と「余白」、二つの意味を一語に</h4>
+      <p>ブランド名「latent」は、生成AIモデルの核である"latent space"（潜在空間）と、二つの思考の間にある余白という二重の意味を持たせた造語的な使い方をしている。素材は瞑想する人影・意識と光の糸で編まれる人体・ブラックホール状の渦など、AI/意識をテーマにしたモノクロビジュアル群。装飾ではなく、そのまま演出のロジックを駆動する原材料として扱った。</p>
+    </div>
+
+    <div class="case-section reveal">
+      <span class="n serif">03 — コンセプト</span>
+      <h4 class="serif">静止画を、3つのリアルタイム処理で「生きた画面」に変える</h4>
+      <p>採用したのは3層の掛け合わせ。①GLSLシェーダーによる常時変形——ノイズを重ねたフロー場が画面全体を絶えず揺らし、どの瞬間も同じ形にならない。②深度パララックス——奥/中/手前の3レイヤーがカーソル位置に応じて別々の速度でズレ、平面の画像に奥行きを生む。③加算（スクリーン）合成——黒い背景同士は打ち消し合い、光の筋だけが層を越えて重なり合う。この3つは動画の代わりであると同時に、素材にある「意識の糸が編まれる」というモチーフそのものの表現にもなっている。</p>
+    </div>
+
+    <div class="case-art reveal">
+      <span class="n serif">04 — アートディレクション</span>
+      <h4 class="serif">色を足さず、白黒だけで押し切る</h4>
+      <p>NO4の通常仕様であるダーク×ゴールドをこの作品では意図的に外し、完全な白黒のみで構成した。素材自体がモノクロの生成アートであるため、色を足すとかえって世界観と競合すると判断した結果。UI文字はすべて<code style="font-family:var(--serif);font-style:normal">mix-blend-mode: exclusion</code>を敷き、背景がどれだけ変化し続けても常に可読性を保つ。</p>
+
+      <div class="case-type-sample">
+        <div class="en">"Crossing the center, the field does not collapse."</div>
+        <div class="ja">Inter Tight一書体のみで統一。装飾的な差し色を一切使わない設計。</div>
+      </div>
+      <div class="swatches">
+        <div class="case-swatch" style="background:#000000" title="Black"></div>
+        <div class="case-swatch" style="background:#ffffff;border:1px solid var(--line)" title="White"></div>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top:70px">
+      <span class="n serif" style="display:block;margin-bottom:14px;font-family:var(--serif);font-style:italic;color:var(--gold);font-size:13px;letter-spacing:.2em">05 — 主要画面</span>
+      <div class="stage">
+        <div class="browser grow">
+          <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"><b>latent</b> / hero</span></div>
+          <div class="viewport"><img src="assets/latent/full.png" alt="LATENT ヒーロー画面" loading="lazy"></div>
+        </div>
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="screen" style="--pvh:600px"><img src="assets/latent/mobile.png" alt="LATENT モバイル画面" loading="lazy"></div>
+        </div>
+      </div>
+      <div class="cap-row"><span>Concept Work</span><span class="dotline"></span><span>Move your cursor &#8597;</span></div>
+    </div>
+
+    <div class="case-section reveal">
+      <span class="n serif">06 — モーション/インタラクション</span>
+      <h4 class="serif">触っても、触らなくても止まらない</h4>
+      <p>カーソルを動かすと3レイヤーが深度に応じて視差移動し、あわせて各層のノイズフローの位相もずれる。だが主役はカーソルではない——フロー場は常時・全面で駆動しており、静止していても画面は波打ち続ける。タッチ端末ではカーソルの代わりに緩やかな円軌道の自動ドリフトが同じ役割を担い、指で触れなくても常に生きた状態を保つ。</p>
+    </div>
+
+    <div class="case-section reveal">
+      <span class="n serif">07 — 制作プロセス</span>
+      <h4 class="serif">3回作り直して、ようやく「生きてる」にたどり着いた</h4>
+      <p>最初の実装はカーソルのX位置で2枚の画像をクロスフェードするだけの案だった。動かして見せたところ「効いてる部分だけ動いてるけど、そうじゃない」というフィードバックが返り、画面全体が常時変形するGLSLの歪みシェーダーに作り替えた。</p>
+      <p>それでもまだ「1枚の写真が出てるだけ」という評価だった。参照に挙がったのがShopify Editions Winter '26のヒーロー——複数レイヤーがカーソルでズレて奥行きを見せる視差演出。この技術を解剖し、「常時変形するシェーダー」と「深度パララックス」を1つの画面に統合したのが最終形になっている。仮説→実機確認→評価→作り直し、を1セッション内で3周した結果の作品。</p>
+    </div>
+
+    <div class="case-results reveal">
+      <div class="before">
+        <div class="label">Before</div>
+        <ul>
+          <li>ヒーロー背景は購入・生成済みの動画ファイルをループ再生</li>
+          <li>見る人の操作に画面は一切反応しない</li>
+          <li>同じ数秒が繰り返されるだけの背景</li>
+        </ul>
+      </div>
+      <div class="after">
+        <div class="label">After</div>
+        <ul>
+          <li>動画ファイル0本、すべてリアルタイムGPU描画</li>
+          <li>カーソル・スクロール・タッチ、すべてに反応</li>
+          <li>二度と同じ瞬間が訪れない、常時変化する画面</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="case-next reveal">
+      <div class="lbl">Next Case Study</div>
+      <a href="#s-work-05">Curfew &#8594;</a>
+    </div>
+
+  </section>
+
+  <!-- 05 CURFEW -->
+  <section class="work" id="s-work-05">
     <div class="head reveal">
-      <div class="idx">04</div>
+      <div class="idx">05</div>
       <div>
         <div class="tags"><span class="tag-pill">LP</span><span class="tag-pill muted">Concept</span></div>
         <h3 class="serif">CURFEW</h3>
@@ -316,10 +421,10 @@
     </div>
   </section>
 
-  <!-- 05 VIGIL -->
-  <section class="work" id="s-work-05">
+  <!-- 06 VIGIL -->
+  <section class="work" id="s-work-06">
     <div class="head reveal">
-      <div class="idx">05</div>
+      <div class="idx">06</div>
       <div>
         <div class="tags"><span class="tag-pill">LP</span><span class="tag-pill muted">Concept</span></div>
         <h3 class="serif">VIGIL</h3>

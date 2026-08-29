@@ -1,0 +1,7 @@
+{
+  "hall_truck": {"frames": 150, "path": "assets/film/hall_truck"},
+  "corridor":   {"frames": 210, "path": "assets/film/corridor"},
+  "wall_track": {"frames": 241, "path": "assets/film/wall_track"},
+  "eye":        {"frames": 70,  "path": "assets/film/eye"},
+  "pull_back":  {"frames": 120, "path": "assets/film/pull_back"}
+}

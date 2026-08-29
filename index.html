@@ -10,159 +10,142 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@100;300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body class="noir-top">
+<body class="film-page noir-top">
+
+<!-- THE LONG TAKE (2026-08-20): single fixed canvas is the background for
+     the entire page — no per-section background images, no .dark-journey
+     wrapper. See film.js / film.cues.js / film.layers.js / film.overlay.js. -->
+<canvas id="filmCanvas"></canvas>
+<!-- THE LONG TAKE, in three planes (2026-08-24, Vault: NO4サイト3D化構成案):
+     BG (filmCanvas, above) -> FG (below, alpha-punched foreground plates,
+     pointer-events:none) -> DOM text (main, z-index:1). Occlusion is what
+     reads as depth, not resolution — see film.fg.js. Sits between the two
+     in z-index (styles.css), same size/DPR handling as filmCanvas via a
+     shared resize path. -->
+<canvas id="filmFgCanvas"></canvas>
 
 <header class="topbar">
   <div class="mark"><img class="mark-icon" src="assets/brand/no4-mark.png" alt="">No<b>4.</b>DesignClub</div>
-  <div class="meta">Selected Works · 2026</div>
+  <div class="topbar-right">
+    <div class="meta">Selected Works · 2026</div>
+    <a class="works-jump" href="#s-categories">Works &#8595;</a>
+  </div>
 </header>
 
-<!-- ============ SIDE NAV (PC only) ============ -->
-<nav class="side-nav">
-  <a href="#s-hero" class="dot" data-label="Intro"></a>
-  <a href="#s-statement" class="dot" data-label="Statement"></a>
-  <a href="#s-categories" class="dot" data-label="Categories"></a>
-  <a href="#s-process" class="dot" data-label="Process"></a>
-  <a href="#s-closing" class="dot" data-label="Closing"></a>
+<!-- ============ CHAPTER RAIL (PC only) ============
+     Replaces the old unnamed side-nav dots (design doc §4.6, modeled on
+     Shopify Editions' always-on chapter index): current act drives directly
+     from film.js's tl.act/tl.localT every frame via film.overlay.js, not an
+     IntersectionObserver — more accurate for a 760vh single-take page. -->
+<nav class="chapter-rail" id="chapterRail">
+  <a href="#s-hero" data-act="hero"><span class="num serif">I</span><span class="name">Approach</span><span class="pct"></span></a>
+  <a href="#s-categories" data-act="works"><span class="num serif">II</span><span class="name">Works</span><span class="pct"></span></a>
+  <a href="#s-statement" data-act="statement"><span class="num serif">III</span><span class="name">Statement</span><span class="pct"></span></a>
+  <a href="#s-process" data-act="process"><span class="num serif">IV</span><span class="name">Process</span><span class="pct"></span></a>
+  <a href="#s-closing" data-act="closing"><span class="num serif">V</span><span class="name">Contact</span><span class="pct"></span></a>
 </nav>
 
-<!-- ============ HERO ============ -->
-<section class="hero hero-noir" id="s-hero" style="--hero-img:url('assets/hero/hero_bg_rock_notext.jpg')">
-  <div class="hero-bg"></div>
-  <div class="hero-duotone"></div>
-  <div class="hero-scrim"></div>
-  <div class="hero-spot"></div>
-  <div class="wrap">
-    <div class="no reveal">N&deg; 04 &nbsp;—&nbsp; Design Studio</div>
-    <div class="brand-lockup">
-      <img class="brand-icon reveal" src="assets/brand/no4-mark.png" alt="">
-      <h1 class="reveal">No4.
-        <span class="club serif">DesignClub</span>
-      </h1>
-    </div>
-    <div class="rule reveal"></div>
-  </div>
-  <div class="scroll-cue">Scroll</div>
-</section>
+<main>
 
-<div class="dark-journey">
-<!-- ============ STATEMENT ============ -->
-<section class="statement" id="s-statement">
-  <div class="wrap">
-    <div class="grid">
-      <div>
-        <span class="eyebrow reveal">N&deg; 01 &mdash; Statement</span>
-        <div class="k serif reveal reveal-headline"><span class="g">見た瞬間、惚れさせる。</span><br>この幅と、このクオリティ。</div>
+<!-- ============ ACT I — THE APPROACH ============ -->
+<section id="s-hero">
+  <div class="hold hero">
+    <div class="wrap">
+      <div class="no">( N&deg; 04 &nbsp;—&nbsp; Design Studio )</div>
+      <div class="brand-lockup">
+        <img class="brand-icon" src="assets/brand/no4-mark.png" alt="">
+        <h1>No4.
+          <span class="club serif">DesignClub</span>
+        </h1>
       </div>
-      <div>
-        <p class="reveal reveal-left">エディトリアルなLP、リアルタイムで動くKPIダッシュボード、写真から起こす映像、実写の撮影、そして数字の裏側を読み解く診断まで。<span class="g" style="white-space:nowrap">毛色の違う成果物を、ひとつのチームで。</span></p>
-        <p class="reveal reveal-left" style="transition-delay:.15s">制作会社に分割発注する必要はありません。企画から実装まで、<span class="g">ひとつのチームが最後まで仕上げる</span>——その物量とスピードを、言葉ではなく実物で確かめてください。</p>
+      <div class="rule"></div>
+    </div>
+    <div class="scroll-cue">( Scroll )</div>
+  </div>
+</section>
+
+<!-- ============ ACT II — SIX WINDOWS (2026-08-20: moved ahead of Statement,
+     was ACT III. keiichi wanted the film + works experienced before the PR
+     pitch — see film.cues.js's works act header comment. Old RUN-label +
+     HOLD-card-grid replaced with 6 stations (run→hold×6→tail), each hold
+     surfacing one category as a full-bleed word + a real work "plate." ============ -->
+<section id="s-categories">
+  <div class="hold band">
+    <div class="station-layer" id="stationLayer">
+      <a class="work-station" data-idx="0" href="category-lp.html"></a>
+      <a class="work-station" data-idx="1" href="category-dashboard.html"></a>
+      <a class="work-station" data-idx="2" href="category-app.html"></a>
+      <a class="work-station" data-idx="3" href="category-film.html"></a>
+      <a class="work-station" data-idx="4" href="category-photography.html"></a>
+      <a class="work-station" data-idx="5" href="category-pulse.html"></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT III (2026-08-20: was II) — THE COLUMN ============ -->
+<section id="s-statement">
+  <div class="hold statement">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <span class="eyebrow">( III &mdash; Statement )</span>
+          <div class="k serif"><span class="g">見た瞬間、惚れさせる。</span><br>この幅と、このクオリティ。</div>
+        </div>
+        <div>
+          <p>エディトリアルなLP、リアルタイムで動くKPIダッシュボード、写真から起こす映像、実写の撮影、そして数字の裏側を読み解く診断まで。<span class="g" style="white-space:nowrap">毛色の違う成果物を、ひとつのチームで。</span></p>
+          <p>制作会社に分割発注する必要はありません。企画から実装まで、<span class="g">ひとつのチームが最後まで仕上げる</span>——その物量とスピードを、言葉ではなく実物で確かめてください。</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ CATEGORIES ============ -->
-<section class="band" id="s-categories">
-  <div class="wrap">
-    <span class="eyebrow reveal">N&deg; 02 &mdash; Selected Works · 06 Categories</span>
-    <h2 class="serif reveal">Works.</h2>
-    <p class="sub reveal">カテゴリを選んでください。それぞれの実績ページへ移動します。</p>
+<!-- ============ ACT IV — THE EYE ============ -->
+<section id="s-process">
+  <div class="hold process">
+    <div class="wrap"></div>
   </div>
 </section>
 
-<div class="wrap">
-  <div class="cat-grid reveal">
-
-    <a class="cat-card" href="category-lp.html">
-      <div class="bg"><img src="assets/thumbs/gen_lp.jpg" alt="" loading="lazy"></div>
-      <span class="n serif">01</span>
-      <h3>LP</h3>
-      <p>世界観を、誌面のように組む。ハイブランド誌の文法で作るエディトリアルLP。</p>
-      <div class="meta-row"><span>5 Works</span><span class="arrow">&#8599;</span></div>
-    </a>
-
-    <a class="cat-card" href="category-dashboard.html">
-      <div class="bg"><img src="assets/thumbs/gen_dashboard.jpg" alt="" loading="lazy"></div>
-      <span class="n serif">02</span>
-      <h3>Dashboard</h3>
-      <p>数字を、リアルタイムで魅せる。売上・KPI・資産を可視化するWebダッシュボード。</p>
-      <div class="meta-row"><span>2 Works</span><span class="arrow">&#8599;</span></div>
-    </a>
-
-    <a class="cat-card" href="category-app.html">
-      <div class="bg"><img src="assets/thumbs/gen_app.jpg" alt="" loading="lazy"></div>
-      <span class="n serif">03</span>
-      <h3>App</h3>
-      <p>体験を、プロダクトに落とす。日々使われる、実用アプリケーション設計。</p>
-      <div class="meta-row"><span>2 Works</span><span class="arrow">&#8599;</span></div>
-    </a>
-
-    <a class="cat-card" href="category-film.html">
-      <div class="bg"><img src="assets/thumbs/gen_film.jpg" alt="" loading="lazy"></div>
-      <span class="n serif">04</span>
-      <h3>Brand Film</h3>
-      <p>一枚の写真から、映画を起こす。独自パイプラインによるシネマティック・ブランドフィルム。</p>
-      <div class="meta-row"><span>1 Work</span><span class="arrow">&#8599;</span></div>
-    </a>
-
-    <a class="cat-card" href="category-photography.html">
-      <div class="bg"><img src="assets/thumbs/gen_photography.jpg" alt="" loading="lazy"></div>
-      <span class="n serif">05</span>
-      <h3>Photography</h3>
-      <p>レンズが、世界観を焼き付ける。専属カメラマンによる実写エディトリアル撮影。</p>
-      <div class="meta-row"><span>1 Work</span><span class="arrow">&#8599;</span></div>
-    </a>
-
-    <a class="cat-card" href="category-pulse.html">
-      <div class="bg"><img src="assets/thumbs/gen_pulse.jpg" alt="" loading="lazy"></div>
-      <span class="n serif">06</span>
-      <h3>PULSE</h3>
-      <p>数字の裏側を、突き止める。GA4・GBP・口コミを横断して読む、月次診断サービス。</p>
-      <div class="meta-row"><span>1 Work</span><span class="arrow">&#8599;</span></div>
-    </a>
-
-  </div>
-</div>
-
-<!-- ============ ATELIER OFFER BAND ============ -->
-<section class="band atl-band-tight" style="padding-top:10px">
-  <div class="wrap">
-    <a class="atl-index-row ext" href="atelier.html" style="border-top:1px solid rgba(245,244,241,.14)">
-      <span class="n serif">N&deg;02.5</span>
-      <span class="en serif">NO4 ATELIER.</span>
-      <span class="ja">「作れるもの」の先に、「毎月どう関わるか」がある。</span>
-      <span class="arrow">&#8599;</span>
-    </a>
-  </div>
-</section>
-
-<!-- ============ PROCESS ============ -->
-<section class="process" id="s-process">
-  <div class="wrap">
-    <span class="eyebrow reveal">N&deg; 03 &mdash; Process</span>
-    <p class="reveal reveal-headline">アイデアと実装のあいだに、<br><span class="g" style="white-space:nowrap">誰も挟まない。</span></p>
-    <p class="fine reveal">分割発注なし。ひとつのチームで、最後まで。</p>
-  </div>
-</section>
-
-<!-- ============ CLOSING ============ -->
-<section class="closing" id="s-closing">
-  <div class="wrap">
-    <img class="brand-icon reveal" src="assets/brand/no4-mark.png" alt="">
-    <div class="mark serif reveal reveal-headline">No4.
-      <span class="club">DesignClub</span>
+<!-- ============ ACT V — THE EXIT ============ -->
+<section id="s-closing">
+  <div class="hold closing">
+    <!-- moved here from the old works-index tail (2026-08-20): keiichi
+         wanted the works act itself text-free after PULSE, and this list
+         parked at the end of the whole piece instead of mid-scroll. -->
+    <nav class="closing-index" id="closingIndex">
+      <a href="category-lp.html"><span class="n serif">01</span><span class="w">LP</span></a>
+      <a href="category-dashboard.html"><span class="n serif">02</span><span class="w">Dashboard</span></a>
+      <a href="category-app.html"><span class="n serif">03</span><span class="w">App</span></a>
+      <a href="category-film.html"><span class="n serif">04</span><span class="w">Brand Film</span></a>
+      <a href="category-photography.html"><span class="n serif">05</span><span class="w">Photography</span></a>
+      <a href="category-pulse.html"><span class="n serif">06</span><span class="w">PULSE</span></a>
+      <a href="atelier.html" class="ext"><span class="n serif">N&deg;01.5</span><span class="w">NO4 ATELIER.</span></a>
+    </nav>
+    <div class="wrap">
+      <img class="brand-icon" src="assets/brand/no4-mark.png" alt="">
+      <div class="mark serif">No4.
+        <span class="club">DesignClub</span>
+      </div>
+      <p class="tag">存在を、設計する。</p>
+      <div class="contact">
+        <span>No4.DesignClub</span>
+        <b>( Private Preview )</b>
+      </div>
+      <div class="foot">&copy; 2026 No4.DesignClub — Selected Works</div>
     </div>
-    <p class="tag reveal">存在を、設計する。</p>
-    <div class="contact reveal">
-      <span>No4.DesignClub</span>
-      <b>Private Preview</b>
-    </div>
-    <div class="foot reveal">&copy; 2026 No4.DesignClub — Selected Works</div>
   </div>
 </section>
-</div>
+
+</main>
 
 <script src="common.js"></script>
+<script src="timeline.js"></script>
+<script src="film.cues.js"></script>
+<script src="film.loader.js"></script>
+<script src="film.layers.js"></script>
+<script src="film.fg.js"></script>
+<script src="film.js"></script>
+<script src="film.overlay.js"></script>
 </body>
 </html>
