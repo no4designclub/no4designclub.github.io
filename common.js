@@ -43,7 +43,7 @@
 (function(){
   var isPC = window.matchMedia('(hover:hover) and (pointer:fine) and (min-width:1101px)').matches;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  if(!isPC || reduceMotion) return;
+  if(!isPC || reduceMotion || document.body.classList.contains('film-page')) return;
   document.documentElement.classList.add('has-fine-cursor');
 
   /* カーソル追従スポットライト：暗い面（ヒーロー写真・カテゴリカード）にマウスを近づけると光が差し込む */

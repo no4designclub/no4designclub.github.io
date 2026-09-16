@@ -226,7 +226,11 @@ window.NO4 = window.NO4 || {};
     // has settled into act I's calm/HOLD window (segments[1] + calm start at
     // 0.62 in film.cues.js) — motion resolves, then the brand appears, not
     // the other way around.
-    riseIn(els.heroWrap, localT, 0.58, 0.70, 0.86, 0.94);
+    var opacity=smoothstep(clamp01((localT-0.85)/0.07));
+    opacity*=1-smoothstep(clamp01((localT-0.99)/0.01));
+    setReveal(els.heroWrap,opacity,(1-opacity)*8,0,1,0);
+    var cue=document.querySelector('#s-hero .scroll-cue');
+    if(cue)cue.style.opacity=String(Math.max(0,1-localT/0.08));
   }
 
   function updateStatement(localT){

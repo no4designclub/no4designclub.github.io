@@ -25,118 +25,50 @@ window.NO4 = window.NO4 || {};
   "use strict";
 
   var CLIPS = {
-    hall_truck: {frames: 150, path: 'assets/film/hall_truck'},
-    corridor:   {frames: 210, path: 'assets/film/corridor'},
-    wall_track: {frames: 241, path: 'assets/film/wall_track'},
-    eye:        {frames: 70,  path: 'assets/film/eye'},
-    pull_back:  {frames: 120, path: 'assets/film/pull_back'}
+    // THE WHITE ASCENT (2026-09-10) — replaces THE GILDED RIFT as hall_truck's
+    // footage. Gilded Rift's frames were deleted from assets/film/gilded
+    // (2026-09-10) once White Ascent was confirmed as the replacement —
+    // recoverable from commit 37b3a02 if ever needed again. Luma Ray 3.2
+    // multi-keyframe, batch A/B/C
+    // (241f each) simple-concatenated = 723f. Seam frame duplication checked
+    // by hand (pixel diff) and found not to exist, so all 723 frames are used
+    // as-is — dedupe would have introduced a jump, not removed one. Extracted
+    // from the approved preview mp4 with lanczos scaling only (no hqdn3d/eq
+    // grading chain — the approved look is the source look).
+    hall_truck: {frames: 723, path: 'assets/film/white-ascent', detailPath: 'assets/film/white-ascent/detail'}
   };
 
   var ACTS = {
     // ACT I — THE APPROACH. hall_truck 1->150. Camera trucks right across
     // the skyscraper canyon; near-column occluder sweeps the frame (real
     // parallax baked into the source, not a synthetic assist).
+    //
+    // 2026-09-09 (Vault: 2026-09-08_NO4_ACT_I_スクロール振付_設計仕様書.md):
+    // segments -> curve. Measured this clip's per-frame luminance/motion
+    // (§3) and found the drama isn't evenly spread — f1-53 carries 10% of
+    // the total change, f71-126 carries 70%. The old linear split gave both
+    // equal scroll distance, which read as "dead, then too fast" rather than
+    // as the run->near-column blackout->emerge->settle the footage actually
+    // has. curve replaces that with a PCHIP (monotone cubic) pass through
+    // the 9 points below, so the scroll distance follows where the motion
+    // actually is instead of the frame index. See film.curve.js for the
+    // evaluator. haze/calm/filament/textWell retiming is a later pass
+    // (design doc §4.5/§10.1 steps 3-4) — untouched here on purpose so this
+    // step's effect (the pacing itself) can be judged on its own.
     hero: {
-      segments: [
-        {t0:0.00, t1:0.62, clipId:'hall_truck', f0:1,   f1:138},
-        {t0:0.62, t1:1.00, clipId:'hall_truck', f0:138, f1:150}
+      clipId: 'hall_truck',
+      curveMode: 'linear',
+      curve: [
+        {t:0.000, f:1}, {t:1.000, f:723}
       ],
-      haze: {x:0.68, y:0.22, alpha:0.14},
+      haze: {x:0.68, y:0.22, alpha:0},
       vignetteCenterY: 0.5,
       calm: {t0:0.62, t1:1.00},
-      filament: {id:'F1', t0:0.30, t1:0.52},
-      textWell: {x:0.50, y:0.46, rx:0.30, ry:0.26, t0:0.10, t1:1.00}
+      textWell: {x:0.50, y:0.46, rx:0.30, ry:0.26, t0:0.86, t1:1.00}
     },
-    // ACT III (v3, was II) — THE COLUMN. corridor's own full 210 frames (no
-    // longer a continuation of act I's clip — hall_truck and corridor are
-    // separate shots now). Now sits after works — joined by the works->
-    // statement dissolve instead of the old hero->statement one.
-    statement: {
-      segments: [
-        {t0:0.00, t1:0.42, clipId:'corridor', f0:1,   f1:170},
-        {t0:0.42, t1:1.00, clipId:'corridor', f0:170, f1:210}
-      ],
-      haze: {x:0.50, y:0.40, alpha:[0.16, 0.22]},
-      vignetteCenterY: 0.5,
-      calm: {t0:0.42, t1:1.00},
-      textWell: {x:0.60, y:0.30, rx:0.36, ry:0.28, t0:0.12, t1:1.00}
-    },
-    // ACT II (v3, was III) — THE GALLERY, "SIX WINDOWS" ★. wall_track's 241
-    // frames (re-encoded 2026-08-24 from the original full-density Kling
-    // source — the deployed clip had been cut down to 110 frames, 3.09vh/
-    // frame, effectively a slideshow over most of the section) — camera
-    // tracks left past the palace wall's glowing windows, water holding a
-    // perfect mirror reflection. Re-sequenced 2026-08-20 (Vault: NO4サイト
-    // SIX WINDOWS設計) to sit right after hero — keiichi wants the film
-    // experienced first, then "what we do," then the PR pitch (statement).
-    // One clip, six stops: run→hold×6→tail, each hold surfacing one
-    // category as a giant word + a real work "plate" (§2.2 of the design
-    // doc), replacing the old RUN-label + HOLD-card-grid design.
-    // Frame numbers below are the original 110-frame breakpoints scaled by
-    // 241/110≈2.1909 (rounded) — still a first pass (even spacing) against
-    // t0/t1, NOT a re-verification of where windows actually sit in the new
-    // footage. §4.8-style hand-tuning against the real footage (does a
-    // window actually sit at f44? f110?) is still owed, same as before.
-    works: {
-      segments: [
-        {t0:0.00, t1:0.05, clipId:'wall_track', f0:1,   f1:18},
-        {t0:0.05, t1:0.10, clipId:'wall_track', f0:18,  f1:44,  ease:true},
-        {t0:0.10, t1:0.19, clipId:'wall_track', f0:44,  f1:50},
-        {t0:0.19, t1:0.24, clipId:'wall_track', f0:50,  f1:77,  ease:true},
-        {t0:0.24, t1:0.33, clipId:'wall_track', f0:77,  f1:83},
-        {t0:0.33, t1:0.38, clipId:'wall_track', f0:83,  f1:110, ease:true},
-        {t0:0.38, t1:0.47, clipId:'wall_track', f0:110, f1:116},
-        {t0:0.47, t1:0.52, clipId:'wall_track', f0:116, f1:142, ease:true},
-        {t0:0.52, t1:0.61, clipId:'wall_track', f0:142, f1:149},
-        {t0:0.61, t1:0.66, clipId:'wall_track', f0:149, f1:175, ease:true},
-        {t0:0.66, t1:0.75, clipId:'wall_track', f0:175, f1:182},
-        {t0:0.75, t1:0.80, clipId:'wall_track', f0:182, f1:208, ease:true},
-        {t0:0.80, t1:0.89, clipId:'wall_track', f0:208, f1:215},
-        {t0:0.89, t1:1.00, clipId:'wall_track', f0:215, f1:232}
-      ],
-      haze: {x:0.62, y:0.42, alpha:0.18},
-      vignetteCenterY: 0.58, // softens the bottom edge so the water mirror isn't crushed
-      calm: {t0:0.89, t1:1.00}, // only the index tail — stations stay "spoken," per §4.7
-      textWell: {x:0.24, y:0.70, rx:0.30, ry:0.26, t0:0.08, t1:1.00},
-      // plateWell (SAME LIGHT §3.4) removed 2026-08-20 along with the plate
-      // images themselves — keiichi wants each station as text-only, footage
-      // + word/sub/meta, no photo/video "exhibit." plateWellAlpha() in
-      // film.js went with it (recoverable from git history if plates come
-      // back).
-      //
-      // one station per category, generated from the same six names/hrefs/
-      // copy the old .cat-card grid used (verbatim — no new copy needed).
-      // tIn/t0/t1 line up with the run/hold segments above (tIn = run
-      // start, t0 = hold start, t1 = hold end).
-      stations: (function(){
-        var defs = [
-          {name:'LP',          sub:'世界観を、誌面のように組む。ハイブランド誌の文法で作るエディトリアルLP。',                 count:'5 Works', href:'category-lp.html'},
-          {name:'Dashboard',   sub:'数字を、リアルタイムで魅せる。売上・KPI・資産を可視化するWebダッシュボード。',           count:'2 Works', href:'category-dashboard.html'},
-          {name:'App',         sub:'体験を、プロダクトに落とす。日々使われる、実用アプリケーション設計。',                       count:'2 Works', href:'category-app.html'},
-          {name:'Brand Film',  sub:'一枚の写真から、映画を起こす。独自パイプラインによるシネマティック・ブランドフィルム。', count:'1 Work',  href:'category-film.html'},
-          {name:'Photography', sub:'レンズが、世界観を焼き付ける。専属カメラマンによる実写エディトリアル撮影。',               count:'1 Work',  href:'category-photography.html'},
-          {name:'PULSE',       sub:'数字の裏側を、突き止める。GA4・GBP・口コミを横断して読む、月次診断サービス。',           count:'1 Work',  href:'category-pulse.html'}
-        ];
-        return defs.map(function(d, i){
-          var tIn = 0.05 + i * 0.14, t0 = tIn + 0.05, t1 = tIn + 0.14;
-          d.num = String(i + 1).padStart(2, '0');
-          d.tIn = tIn; d.t0 = t0; d.t1 = t1;
-          return d;
-        });
-      })()
-    },
-    // ACT IV — THE EYE ★★. eye 1->70, forward — the payoff shot, unchanged.
-    // Climax is pinned here; do not move it (design non-negotiable).
-    process: {
-      segments: [
-        {t0:0.00, t1:0.55, clipId:'eye', f0:1,  f1:62},
-        {t0:0.55, t1:1.00, clipId:'eye', f0:62, f1:70}
-      ],
-      haze: {x:0.50, y:0.50, alpha:0.16},
-      vignetteCenterY: 0.5,
-      calm: {t0:0.55, t1:1.00},
-      textWell: {x:0.50, y:0.22, rx:0.30, ry:0.24, t0:0.12, t1:1.00}
-    },
+
+
+
     // ACT V — THE EXIT. pull_back's own 120 frames (re-sampled 2026-08-24
     // from the original 241-frame Kling source — the deployed clip had been
     // cut down to 60 frames, 3.17vh/frame, effectively a still image over
@@ -148,9 +80,7 @@ window.NO4 = window.NO4 || {};
     // windows do, so a proportional rescale is exact, not an approximation.
     closing: {
       segments: [
-        {t0:0.00, t1:0.03, clipId:'pull_back', f0:1,   f1:1},
-        {t0:0.03, t1:0.62, clipId:'pull_back', f0:1,   f1:104},
-        {t0:0.62, t1:1.00, clipId:'pull_back', f0:104, f1:120}
+        {t0:0.00, t1:1.00, clipId:'hall_truck', f0:723, f1:723}
       ],
       haze: {x:0.50, y:[0.52, 0.50], alpha:[0.12, 0.06]},
       vignetteCenterY: 0.5,
@@ -167,6 +97,31 @@ window.NO4 = window.NO4 || {};
     }
   };
 
+  // ---------- hero curve A/B (2026-09-10) ----------
+  // Two independent implementations of THE WHITE ASCENT's hero pacing were
+  // built in parallel to compare: this file's shipped `hero.curve` (Codex) is
+  // a flat linear map — same scroll distance per frame throughout, chosen
+  // after keiichi found an earlier choreographed pass "too fast, with jumps."
+  // That earlier pass (Fable5) is kept here as `?curve=pchip` so it can be
+  // felt head-to-head against the same 723 frames and the same 2400svh
+  // scroll distance (gilded.css) — only the curve shape differs, so any felt
+  // difference is the curve, not a confound from clip length or distance.
+  // Fable5's key positions (1-indexed): K1=1 K2=37 K3=97 K4=151 K5=199 |
+  // K6=241 (A/B seam) K7=284 K8=338 K9=386 K10=434 | K11=482 (B/C seam)
+  // K12=579 K13=723. Regex-on-location.search, matching the file's existing
+  // ?hero= / film.js's ?film=debug idiom (no URLSearchParams, ES5 posture).
+  var curveParam = (location.search.match(/[?&]curve=([\w-]+)/) || [])[1];
+  if(curveParam === 'pchip'){
+    ACTS.hero.curveMode = 'pchip';
+    ACTS.hero.curve = [
+      {t:0.000, f:1},   {t:0.070, f:5},   {t:0.145, f:37},
+      {t:0.230, f:97},  {t:0.300, f:151}, {t:0.360, f:199},
+      {t:0.415, f:241}, {t:0.470, f:284}, {t:0.535, f:338},
+      {t:0.595, f:386}, {t:0.655, f:434}, {t:0.715, f:482},
+      {t:0.820, f:579}, {t:0.960, f:710}, {t:1.000, f:723}
+    ];
+  }
+
   // §8 transitions: which acts they sit between, and how they're drawn.
   // film.layers.js reads these by act name at each act's tail/head window.
   // 'dir' (smear only) is the offset direction multiplier — matched to the
@@ -177,12 +132,7 @@ window.NO4 = window.NO4 || {};
   // only works and statement swapped, so only their two transition pairs
   // are new — smear/dissolve reused from the retired pairs they replace,
   // matched to whichever clip pair now sits at that seam (see design doc §1.2).
-  var TRANSITIONS = {
-    'hero->works':         {type:'smear',     window:[0.94, 1.00], inWindow:[0.00, 0.04], dir:-1},
-    'works->statement':    {type:'dissolve',  window:[0.94, 1.00], inWindow:[0.00, 0.06]},
-    'statement->process':  {type:'iris',      window:[0.92, 1.00], inWindow:[0.00, 0.06]},
-    'process->closing':    {type:'cut',       window:[0.97, 1.00], inWindow:[0.00, 0.00]}
-  };
+  var TRANSITIONS = {};
 
   // §depth (2026-08-24): per-act FG plate specs for film.fg.js. {src, x, y,
   // w, h, alpha} in canvas-space fractions (0..1 of viewport width/height).
@@ -197,5 +147,5 @@ window.NO4 = window.NO4 || {};
   // logo mark until 工程2's actual art replaces it.
   var LAYERS = {};
 
-  NO4.filmCues = {clips:CLIPS, acts:ACTS, transitions:TRANSITIONS, layers:LAYERS, actOrder:['hero','works','statement','process','closing']};
+  NO4.filmCues = {clips:CLIPS, acts:ACTS, transitions:TRANSITIONS, layers:LAYERS, actOrder:['hero','closing']};
 })(window.NO4);

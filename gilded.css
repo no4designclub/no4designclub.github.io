@@ -1,0 +1,48 @@
+/* Hero-only overrides; the existing page and its chapter clock remain intact. */
+html:has(body.film-page){scroll-behavior:auto}
+body.film-page::before{display:none}
+body.film-page #s-hero{min-height:4200svh}
+#gildedPoster{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;z-index:0}
+html.gilded-ready #gildedPoster{visibility:hidden}
+body.film-page #s-hero .hold{position:fixed;inset:0;width:100%;height:100svh;min-height:0;visibility:hidden}
+body.film-page #s-hero .hold.is-current{visibility:visible}
+body.film-page #s-hero .wrap{max-width:calc(100% - 48px)}
+body.film-page #s-hero .no{letter-spacing:0}
+body.film-page #s-hero .hero{padding:88px 0}
+body.film-page #s-hero .wrap{padding:0 24px;text-align:center;will-change:opacity,transform}
+body.film-page #s-hero .no{margin-bottom:28px;font-style:normal;font-size:11px;color:#c9b583}
+body.film-page #s-hero .brand-icon{height:72px;margin-bottom:22px}
+body.film-page #s-hero h1{font-weight:500;line-height:1.06}
+body.film-page #s-hero .club{font-weight:400;line-height:1.12;margin-top:8px}
+body.film-page #s-hero .rule{height:1px;width:48px;margin:28px auto 0;opacity:.65}
+body.film-page #s-hero .rule::before{display:none}
+body.film-page .topbar .mark{letter-spacing:0;font-size:17px}
+body.film-page .topbar .works-jump{letter-spacing:0;min-height:44px;display:inline-flex;align-items:center}
+body.film-page .topbar .meta{letter-spacing:0;color:#c1beb7}
+body.film-page .topbar{background:rgba(8,8,8,.22);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom-color:rgba(255,255,255,.05)}
+body.film-page .topbar a:focus-visible,body.film-page .chapter-rail a:focus-visible{outline:1px solid #d9b878;outline-offset:6px}
+body.film-page #s-hero h1{font-size:80px;letter-spacing:0}
+body.film-page #s-hero .club{font-size:56px;letter-spacing:0}
+@media(max-width:900px){
+ body.film-page #s-hero{min-height:3800svh}
+ body.film-page #s-hero h1{font-size:52px}
+ body.film-page #s-hero .club{font-size:34px}
+ body.film-page #s-hero .brand-lockup{gap:16px}
+ body.film-page #s-hero .brand-icon{max-width:72px;height:60px;width:auto}
+ body.film-page #s-hero .no{font-size:10px}
+}
+@media(max-height:550px){
+ body.film-page #s-hero .hero{padding:76px 0 24px}
+ body.film-page #s-hero .no{margin-bottom:12px}
+ body.film-page #s-hero .brand-icon{height:40px;margin-bottom:12px}
+ body.film-page #s-hero h1{font-size:48px}
+ body.film-page #s-hero .club{font-size:30px}
+ body.film-page #s-hero .rule{margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.film-page section[id]{min-height:100svh!important}
+ body.film-page .hold,body.film-page #s-hero .hold{position:relative;inset:auto;width:100%;height:auto;min-height:100svh;visibility:visible}
+ body.film-page .hold .wrap,body.film-page .hold .wrap *{opacity:1!important;transform:none!important;filter:none!important}
+ body.film-page .scroll-cue{display:none}
+ body.film-page .work-station{position:relative;opacity:1!important;transform:none!important}
+}

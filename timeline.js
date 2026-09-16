@@ -7,12 +7,15 @@ window.NO4 = window.NO4 || {};
 (function(NO4){
   "use strict";
 
-  // v3 order (2026-08-20 SIX WINDOWS): works moved right after hero. This
-  // array must always match film.cues.js's actOrder AND the physical
-  // <section> order in index.html — all three have to move together or
-  // localT mapping breaks (see film.cues.js's TRANSITIONS comment).
-  var ORDER = ['hero','works','statement','process','closing'];
-  var ids = {hero:'s-hero', statement:'s-statement', works:'s-categories', process:'s-process', closing:'s-closing'};
+  // v4 order (2026-09-16, 2-act cut: hero/closing). This array must always
+  // match film.cues.js's actOrder AND the physical <section> order in
+  // index.html — all three have to move together or localT mapping breaks.
+  // (2026-09-16: the 5-act list was left here after works/statement/process
+  // were removed from index.html + film.cues.js; their missing sections
+  // measured as top=0, so sample() reported act 'process' for the whole
+  // hero range — a cue film.js no longer had, so no frame was ever drawn.)
+  var ORDER = ['hero','closing'];
+  var ids = {hero:'s-hero', closing:'s-closing'};
   var els = {};
   var docTops = {}; // absolute document-relative top, NOT offsetTop (which is relative to
                      // the nearest positioned ancestor — .dark-journey is position:relative
@@ -32,7 +35,7 @@ window.NO4 = window.NO4 || {};
   }
   measure();
 
-  function sample(){
+  function sample(scrollY){
     if(!els.hero || !els.closing) return {p:0, act:'hero', actIndex:0, localT:0};
 
     var docTop = docTops.hero;
@@ -40,7 +43,7 @@ window.NO4 = window.NO4 || {};
     // closing element's raw document-bottom (which is ~scrollHeight, always
     // innerHeight taller than the furthest the user can actually scroll to).
     var total = Math.max(1, (docBottom - window.innerHeight) - docTop);
-    var y = window.scrollY - docTop;
+    var y = (scrollY === undefined ? window.scrollY : scrollY) - docTop;
     var p = Math.min(1, Math.max(0, y/total));
 
     var tops = ORDER.map(function(k){ return els[k] ? (docTops[k] - docTop) : 0; });
@@ -64,7 +67,7 @@ window.NO4 = window.NO4 || {};
   // content really is instead of guessed percentages that drift out of sync
   // whenever copy length changes.
   function actBoundaries(){
-    if(!els.hero || !els.closing) return {hero:0,statement:0,works:0,process:0,closing:1};
+    if(!els.hero || !els.closing) return {hero:0,closing:1};
     var docTop = docTops.hero;
     var total = Math.max(1, (docBottom - window.innerHeight) - docTop);
     var out = {};

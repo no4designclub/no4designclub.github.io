@@ -7,8 +7,10 @@
 <script>document.documentElement.classList.add('js');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@100;300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@100;300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="styles.css?v=20260916174625">
+<link rel="stylesheet" href="gilded.css?v=20260916174625">
+<link rel="preload" as="image" href="assets/film/white-ascent/lo/f_0001.jpg" fetchpriority="high">
 </head>
 <body class="film-page noir-top">
 
@@ -16,6 +18,7 @@
      the entire page — no per-section background images, no .dark-journey
      wrapper. See film.js / film.cues.js / film.layers.js / film.overlay.js. -->
 <canvas id="filmCanvas"></canvas>
+<img id="gildedPoster" src="assets/film/white-ascent/lo/f_0001.jpg" alt="" fetchpriority="high">
 <!-- THE LONG TAKE, in three planes (2026-08-24, Vault: NO4サイト3D化構成案):
      BG (filmCanvas, above) -> FG (below, alpha-punched foreground plates,
      pointer-events:none) -> DOM text (main, z-index:1). Occlusion is what
@@ -28,7 +31,7 @@
   <div class="mark"><img class="mark-icon" src="assets/brand/no4-mark.png" alt="">No<b>4.</b>DesignClub</div>
   <div class="topbar-right">
     <div class="meta">Selected Works · 2026</div>
-    <a class="works-jump" href="#s-categories">Works &#8595;</a>
+    <a class="works-jump" href="#s-closing">Works &#8595;</a>
   </div>
 </header>
 
@@ -38,11 +41,8 @@
      from film.js's tl.act/tl.localT every frame via film.overlay.js, not an
      IntersectionObserver — more accurate for a 760vh single-take page. -->
 <nav class="chapter-rail" id="chapterRail">
-  <a href="#s-hero" data-act="hero"><span class="num serif">I</span><span class="name">Approach</span><span class="pct"></span></a>
-  <a href="#s-categories" data-act="works"><span class="num serif">II</span><span class="name">Works</span><span class="pct"></span></a>
-  <a href="#s-statement" data-act="statement"><span class="num serif">III</span><span class="name">Statement</span><span class="pct"></span></a>
-  <a href="#s-process" data-act="process"><span class="num serif">IV</span><span class="name">Process</span><span class="pct"></span></a>
-  <a href="#s-closing" data-act="closing"><span class="num serif">V</span><span class="name">Contact</span><span class="pct"></span></a>
+  <a href="#s-hero" data-act="hero"><span class="num serif">I</span><span class="name">Ascent</span><span class="pct"></span></a>
+  <a href="#s-closing" data-act="closing"><span class="num serif">II</span><span class="name">Contact</span><span class="pct"></span></a>
 </nav>
 
 <main>
@@ -69,45 +69,6 @@
      pitch — see film.cues.js's works act header comment. Old RUN-label +
      HOLD-card-grid replaced with 6 stations (run→hold×6→tail), each hold
      surfacing one category as a full-bleed word + a real work "plate." ============ -->
-<section id="s-categories">
-  <div class="hold band">
-    <div class="station-layer" id="stationLayer">
-      <a class="work-station" data-idx="0" href="category-lp.html"></a>
-      <a class="work-station" data-idx="1" href="category-dashboard.html"></a>
-      <a class="work-station" data-idx="2" href="category-app.html"></a>
-      <a class="work-station" data-idx="3" href="category-film.html"></a>
-      <a class="work-station" data-idx="4" href="category-photography.html"></a>
-      <a class="work-station" data-idx="5" href="category-pulse.html"></a>
-    </div>
-  </div>
-</section>
-
-<!-- ============ ACT III (2026-08-20: was II) — THE COLUMN ============ -->
-<section id="s-statement">
-  <div class="hold statement">
-    <div class="wrap">
-      <div class="grid">
-        <div>
-          <span class="eyebrow">( III &mdash; Statement )</span>
-          <div class="k serif"><span class="g">見た瞬間、惚れさせる。</span><br>この幅と、このクオリティ。</div>
-        </div>
-        <div>
-          <p>エディトリアルなLP、リアルタイムで動くKPIダッシュボード、写真から起こす映像、実写の撮影、そして数字の裏側を読み解く診断まで。<span class="g" style="white-space:nowrap">毛色の違う成果物を、ひとつのチームで。</span></p>
-          <p>制作会社に分割発注する必要はありません。企画から実装まで、<span class="g">ひとつのチームが最後まで仕上げる</span>——その物量とスピードを、言葉ではなく実物で確かめてください。</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ ACT IV — THE EYE ============ -->
-<section id="s-process">
-  <div class="hold process">
-    <div class="wrap"></div>
-  </div>
-</section>
-
-<!-- ============ ACT V — THE EXIT ============ -->
 <section id="s-closing">
   <div class="hold closing">
     <!-- moved here from the old works-index tail (2026-08-20): keiichi
@@ -139,13 +100,15 @@
 
 </main>
 
-<script src="common.js"></script>
-<script src="timeline.js"></script>
-<script src="film.cues.js"></script>
-<script src="film.loader.js"></script>
-<script src="film.layers.js"></script>
-<script src="film.fg.js"></script>
-<script src="film.js"></script>
-<script src="film.overlay.js"></script>
+<script src="common.js?v=20260916174625"></script>
+<script src="timeline.js?v=20260916174625"></script>
+<script src="film.cues.js?v=20260916174625"></script>
+<script src="film.curve.js?v=20260916174625"></script>
+<script src="film.cache.js?v=20260916174625"></script>
+<script src="film.detail.js?v=20260916174625"></script>
+<script src="film.layers.js?v=20260916174625"></script>
+<script src="film.fg.js?v=20260916174625"></script>
+<script src="film.js?v=20260916174625"></script>
+<script src="film.overlay.js?v=20260916174625"></script>
 </body>
 </html>

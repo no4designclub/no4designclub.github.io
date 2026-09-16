@@ -21,7 +21,7 @@
 window.NO4 = window.NO4 || {};
 (function(NO4){
   "use strict";
-  if(!NO4.timeline || !NO4.filmCues || !NO4.filmLayers || !NO4.filmLoader) return;
+  if(!NO4.timeline || !NO4.filmCues || !NO4.filmCurve || !NO4.filmLayers || !NO4.filmLoader) return;
 
   var timeline = NO4.timeline;
   var CUES = NO4.filmCues;
@@ -66,9 +66,9 @@ window.NO4 = window.NO4 || {};
   var canvas = document.getElementById('filmCanvas');
   if(!canvas) return;
   var ctx = canvas.getContext('2d');
-  var cw = 1, ch = 1, dpr = 1;
+  var cw = 1, ch = 1, dpr = 1, pixelsPerFrame = 1;
   function resize(){
-    dpr = Math.min(window.devicePixelRatio || 1, tier === 'T2' ? 1.75 : 1);
+    dpr = Math.min(window.devicePixelRatio || 1, tier === 'T2' ? 1.75 : 1.5);
     var rect = canvas.getBoundingClientRect();
     cw = Math.max(1, rect.width); ch = Math.max(1, rect.height);
     canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);
@@ -77,6 +77,10 @@ window.NO4 = window.NO4 || {};
     // load. Nothing re-measured it on resize/rotate — stale offsets desync
     // which act localT reports as the viewport reflows. (Codex review, 2026-08-20.)
     timeline.remeasure();
+    var hero=document.getElementById('s-hero'), closing=document.getElementById('s-closing');
+    if(hero && closing){
+      pixelsPerFrame=Math.max(1,(closing.getBoundingClientRect().top-hero.getBoundingClientRect().top)/(CUES.clips.hall_truck.frames-1));
+    }
   }
   window.addEventListener('resize', resize);
   resize();
@@ -84,7 +88,15 @@ window.NO4 = window.NO4 || {};
     document.fonts.ready.then(function(){ timeline.remeasure(); });
   }
 
-  Loader.init(CUES, cfg.res);
+  if(tier !== 'T0') Loader.init(CUES, cfg.res);
+
+  // §6.1-2 of the ACT I choreography doc: lint the curve-mode acts at boot
+  // (t ascending / f monotonic non-decreasing) — a warn, not a throw, same
+  // tone as film.loader.js's manifest checks.
+  Object.keys(CUES.acts).forEach(function(actName){
+    var cue = CUES.acts[actName];
+    if(cue.curve) NO4.filmCurve.validateCurve(actName, cue.curve);
+  });
 
   var motes = L.makeMotes(cfg.motes);
   var startTime = performance.now();
@@ -93,27 +105,19 @@ window.NO4 = window.NO4 || {};
   var lastActIndex = -1;
   var pendingTierDowngrade = null; // set when a downgrade is due but we wait for the act boundary
 
-  // §motion smoothing: timeline.sample()'s localT tracks raw scrollY 1:1.
-  // A mouse wheel delivers scroll in discrete ~100px notches (no native
-  // easing the way trackpad momentum has), and at ~10-13px/frame that's
-  // several frames skipped in one instant — reads as a slideshow, not
-  // footage (keiichi feedback, 2026-08-20: "もっとスクロールした時に滑らか
-  // に映像が動く感じがいいな"). Damping localT toward its raw value each
-  // rAF turns that jump into a glide across a handful of frames. Scoped to
-  // the canvas-drawn side only (frame lookup, parallax, haze, filament,
-  // transitions) — film.overlay.js's DOM text reveals keep the raw tl so
-  // their hand-tuned localT breakpoints (F2) are untouched.
-  // 0.14 -> 0.07 (2026-08-21, same feedback repeated after the frame
-  // cross-fade above still wasn't smooth enough): halving the rate roughly
-  // doubles the glide's settling time (~120ms -> ~240ms to 63% of the way,
-  // ~360ms -> ~720ms to 95%). Safe to push slower than a typical UI-follow
-  // value because smoothInit resets to a hard snap on every act boundary
-  // (below) — this glide only ever runs *within* one act's scroll, never
-  // drags out a cross-act jump (e.g. the "Works ↓" anchor link) into a
-  // multi-second crawl.
-  var SMOOTH_RATE = 0.07;
+  // One damped scroll position drives both the film and its text overlays.
+  // Keeping it in document pixels preserves continuity across act boundaries.
+  var smoothScrollY = window.scrollY;
   var smoothLocalT = 0;
-  var smoothInit = false;
+  var raf = 0, drawTime = performance.now(), lastSignature = '', paints = 0;
+  function schedule(){if(!document.hidden && !raf && tier !== 'T0') raf=requestAnimationFrame(draw);}
+  window.addEventListener('scroll', schedule, {passive:true});
+  window.addEventListener('resize', function(){lastSignature='';schedule();});
+  window.addEventListener('filmready', function(){lastSignature='';schedule();});
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){cancelAnimationFrame(raf);raf=0;}else{drawTime=performance.now();schedule();}
+  });
+  window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', function(){location.reload();});
 
   // §4.5a velocity-linked text blur: EMA-smoothed scroll speed (px/s),
   // normalized against v0=2200px/s per design doc. Off entirely under
@@ -266,7 +270,7 @@ window.NO4 = window.NO4 || {};
     ctx.fillRect(0, ch - 1, cw * u, 1);
   }
 
-  function debugOverlay(tl, seg, f){
+  function debugOverlay(tl, clipId, f){
     if(!debug) return;
     if(!debugOverlay.el){
       var el = document.createElement('div');
@@ -279,26 +283,41 @@ window.NO4 = window.NO4 || {};
     var s = Loader.stats();
     debugOverlay.el.textContent =
       'act=' + tl.act + ' (' + tl.actIndex + ')  localT=' + tl.localT.toFixed(3) + '\n' +
-      'clip=' + seg.clipId + '  frame=' + Math.round(f) + '/' + CUES.clips[seg.clipId].frames + '\n' +
+      'clip=' + clipId + '  frame=' + Math.round(f) + '/' + CUES.clips[clipId].frames + '\n' +
       'p=' + tl.p.toFixed(3) + '  tier=' + tier + '\n' +
       'loader: hi=' + s.loadedHi + ' lo=' + s.loadedLo + ' inflight=' + s.inflight + ' queued=' + s.queued;
   }
 
   function draw(now){
+    raf=0;
+    if(document.hidden)return;
+    var elapsedTick=now-drawTime;
+    var dt=elapsedTick>64?16.67:Math.max(1,elapsedTick);drawTime=now;
     var tSec = (now - startTime) / 1000;
     var elapsedMs = now - startTime;
 
     if(!Loader.bootReady()){
-      drawBoot(elapsedMs);
-      requestAnimationFrame(draw);
       return;
     }
 
+    var rawY=window.scrollY;
+    // Smooth one document position across both acts, including the boundary.
+    // Limit the first tick after idle so a wheel notch cannot jump 64ms ahead.
+    var scrollStep=(rawY-smoothScrollY)*(1-Math.exp(-dt/220));
+    // Bound the film's catch-up speed during wheel bursts and long seeks.
+    // Closing text retains ordinary damping once both positions are there.
+    if(timeline.sample(smoothScrollY).act==='hero'||timeline.sample(rawY).act==='hero'){
+      var maxStep=pixelsPerFrame*72*dt/1000;
+      scrollStep=Math.max(-maxStep,Math.min(maxStep,scrollStep));
+    }
+    smoothScrollY+=scrollStep;
+    if(Math.abs(rawY-smoothScrollY)<0.2)smoothScrollY=rawY;
     var tl = timeline.sample();
-    var actCue = CUES.acts[tl.act];
+    var vtl = timeline.sample(smoothScrollY);
+    var actCue = CUES.acts[vtl.act];
 
-    if(tl.actIndex !== lastActIndex){
-      lastActIndex = tl.actIndex;
+    if(vtl.actIndex !== lastActIndex){
+      lastActIndex = vtl.actIndex;
       // A large scroll jump (e.g. a direct scrollTo, or a very fast flick)
       // can land 2+ acts away in a single frame. Loader.focus() below then
       // releases (ImageBitmap.close()s) whichever clips are no longer within
@@ -309,7 +328,6 @@ window.NO4 = window.NO4 || {};
       // permanently. lastGoodImg is only ever meant to bridge a gap *within*
       // the current clip anyway, so drop it the moment the act changes.
       lastGoodImg = null;
-      smoothInit = false; // snap to the new act's localT, don't glide in from the old act's number
       if(pendingTierDowngrade && pendingTierDowngrade !== cfg.res){
         cfg = TIER_CFG[tier]; // tier itself doesn't change at runtime; this
         // hook exists for §4.5's "hi->lo downgrade waits for an act boundary"
@@ -319,28 +337,38 @@ window.NO4 = window.NO4 || {};
       }
     }
 
-    if(!smoothInit){ smoothLocalT = tl.localT; smoothInit = true; }
-    else smoothLocalT += (tl.localT - smoothLocalT) * SMOOTH_RATE;
-    // vtl: what the canvas actually draws from. tl (raw) still goes to
-    // film.overlay.js untouched below — see the SMOOTH_RATE comment above.
-    var vtl = {p: tl.p, act: tl.act, actIndex: tl.actIndex, localT: smoothLocalT};
-
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, cw, ch);
+    smoothLocalT=vtl.localT;
+    // The same visual timeline drives the canvas and DOM reveals.
+    var signature=vtl.act+':'+vtl.localT.toFixed(7)+':'+cw+':'+ch;
+    if(signature===lastSignature){if(smoothScrollY!==rawY)schedule();return;}
+    lastSignature=signature;paints++;
 
     var filmShiftPx = 0;
     if(actCue){
-      var seg = findSegment(actCue, vtl.localT);
-      Loader.focus(vtl.actIndex, seg.clipId, (function(){
+      // curve acts (hero, per the 2026-09-09 choreography pass) resolve
+      // frame directly from a single PCHIP pass over the whole act instead
+      // of per-segment linear/eased lerp — see film.curve.js. Acts still on
+      // `segments` (statement/works/process/closing) are unchanged below.
+      var clipId, f;
+      if(actCue.curve){
+        clipId = actCue.clipId;
+        f = NO4.filmCurve.evalCurve(actCue.curve, vtl.localT, actCue.curveMode);
+        f = Math.max(1, Math.min(CUES.clips[clipId].frames, f)); // guard against PCHIP rounding at the curve's own endpoints
+      } else {
+        var seg = findSegment(actCue, vtl.localT);
+        clipId = seg.clipId;
         var span = seg.t1 - seg.t0;
-        var u = span > 0 ? clamp01((vtl.localT - seg.t0) / span) : 1;
-        return lerp(seg.f0, seg.f1, seg.ease ? smoothstep(u) : u);
-      })());
+        var segU = span > 0 ? clamp01((vtl.localT - seg.t0) / span) : 1;
+        if(seg.ease) segU = smoothstep(segU);
+        f = lerp(seg.f0, seg.f1, segU);
+      }
+      var targetFrame=f;
+      if(actCue.curve){
+        var targetT=tl.act===vtl.act?tl.localT:(tl.actIndex>vtl.actIndex?1:0);
+        targetFrame=NO4.filmCurve.evalCurve(actCue.curve,targetT,actCue.curveMode);
+      }
+      Loader.focus(vtl.actIndex, clipId, f, targetFrame);
 
-      var span = seg.t1 - seg.t0;
-      var segU = span > 0 ? clamp01((vtl.localT - seg.t0) / span) : 1;
-      if(seg.ease) segU = smoothstep(segU);
-      var f = lerp(seg.f0, seg.f1, segU);
       // §motion smoothing part 2: SMOOTH_RATE (above) glides localT itself,
       // but the source frames are still an integer sequence at ~600 frames /
       // 760vh (~11px/frame) — a single mouse-wheel notch (~100px) crosses
@@ -353,18 +381,29 @@ window.NO4 = window.NO4 || {};
       // same clipId (seg never changes mid-expression here), so this never
       // blends across a cut.
       var fLo = Math.floor(f), fHi = Math.ceil(f), frac = f - fLo;
-      var imgA = Loader.get(seg.clipId, fLo);
-      var imgB = fHi !== fLo ? Loader.get(seg.clipId, fHi) : imgA;
-      var drawImg = frameOK(imgA) ? imgA : lastGoodImg;
+      var pair = Loader.pair(clipId, f);
+      var imgA = pair.a, imgB = pair.b;
+      frac = pair.blend;
+      var detail = null;
+      if(NO4.filmDetail){
+        if(vtl.act==='hero' && smoothScrollY===rawY && CUES.clips[clipId].detailPath){
+          detail=NO4.filmDetail.get(CUES.clips[clipId].detailPath,fLo,fHi);
+          if(detail){imgA=detail[0];imgB=detail[1]||detail[0];frac=f-fLo;}
+        }else NO4.filmDetail.clear();
+      }
+      var drawImg = frameOK(imgA) ? imgA : null;
       var blendImg = (frac > 0.02 && frameOK(imgB) && imgB !== drawImg) ? imgB : null;
+      if(!drawImg){return;}
 
       // §3.5 screen-space parallax assist: film scales/shifts slightly across
       // each act, motes/haze read the same shift at 4.5x / -0.35x respectively.
       var assistFrac = lerp(-0.0035, 0.0035, vtl.localT);
       var scaleAssist = lerp(1.045, 1.075, vtl.localT);
+      if(vtl.act==='hero'||vtl.act==='closing'){assistFrac=0;scaleAssist=1;}
       filmShiftPx = assistFrac * cw;
 
       var ptr = samplePointer();
+      if(vtl.act==='hero'||vtl.act==='closing')ptr={x:0,y:0};
       var ptrShiftPxX = ptr.x * cw * 0.006, ptrShiftPxY = ptr.y * ch * 0.006;
 
       if(drawImg){
@@ -372,7 +411,7 @@ window.NO4 = window.NO4 || {};
         var baseScale = Math.max(cw / iw, ch / ih) * scaleAssist;
         var dw = iw * baseScale, dh = ih * baseScale;
         var dx = (cw - dw) / 2 + filmShiftPx + ptrShiftPxX;
-        var dy = (ch - dh) / 2 + lerp(-0.004, 0.004, vtl.localT) * ch + ptrShiftPxY;
+        var dy = (ch - dh) / 2 + ptrShiftPxY;
         try {
           ctx.drawImage(drawImg, dx, dy, dw, dh);
           if(blendImg){
@@ -380,6 +419,7 @@ window.NO4 = window.NO4 || {};
             ctx.drawImage(blendImg, dx, dy, dw, dh);
           }
           lastGoodImg = drawImg; // only cache it once we know it actually drew
+          document.documentElement.classList.add('gilded-ready');
         } catch(e){
           // A bitmap the loader had already released (ImageBitmap.close())
           // right before this same frame reached it — e.g. a large scroll
@@ -410,7 +450,7 @@ window.NO4 = window.NO4 || {};
         var ampMul = lerp(1, 0.5, calm);
         L.drawHaze(ctx, cw, ch, anchor, tSec, hazeAlpha, filmShiftPx, ampMul);
       }
-      if(cfg.motes > 0){
+      if(cfg.motes > 0 && vtl.act!=='hero'){
         L.drawMotes(ctx, cw, ch, motes, tSec, filmShiftPx, 1 - calm);
       }
       if(cfg.filament && actCue.filament){
@@ -424,8 +464,10 @@ window.NO4 = window.NO4 || {};
       drawTransitions(vtl);
 
       grainCounter++;
-      L.drawGrain(ctx, cw, ch, grainCounter >> 1, cfg.grainAlpha * lerp(1, 0.7, calm));
-      L.drawVignette(ctx, cw, ch, actCue.vignetteCenterY, actCue.vignetteAlpha);
+      if(vtl.act!=='hero'){
+        L.drawGrain(ctx, cw, ch, grainCounter >> 1, cfg.grainAlpha * lerp(1, 0.7, calm));
+        L.drawVignette(ctx, cw, ch, actCue.vignetteCenterY, actCue.vignetteAlpha);
+      }
 
       if(vtl.act === 'closing' && actCue.blackout){
         var boAlpha = blackoutAlpha(actCue.blackout, vtl.localT);
@@ -435,7 +477,8 @@ window.NO4 = window.NO4 || {};
         }
       }
 
-      debugOverlay(vtl, seg, f);
+      debugOverlay(vtl, clipId, f);
+      NO4.filmState={act:vtl.act,target:tl.localT,current:vtl.localT,frame:f,paints:paints,tier:tier,exact:pair.exact,detail:!!detail,cache:Loader.stats()};
     } else {
       grainCounter++;
       L.drawGrain(ctx, cw, ch, grainCounter >> 1, cfg.grainAlpha);
@@ -448,14 +491,13 @@ window.NO4 = window.NO4 || {};
     // undefined pre-actCue (boot/no-op frame); film.fg.js treats that as
     // "skip this tick" rather than drawing with a stale pointer position.
     if(NO4.filmFg) NO4.filmFg.update(vtl, ptr);
-    if(NO4.filmOverlay) NO4.filmOverlay.update(tl, sampleVelocity(now));
-    requestAnimationFrame(draw);
+    if(NO4.filmOverlay) NO4.filmOverlay.update(vtl, sampleVelocity(now));
+    if(smoothScrollY!==rawY)schedule();
   }
 
   // ---------- T0 (reduced-motion / flat): one static frame per act, no loop ----------
   function runStatic(){
-    Loader.init(CUES, 'lo');
-    var lastAct = null;
+    var lastAct = null, staticRequest=0;
     function poll(){
       var tl = timeline.sample();
       if(tl.act !== lastAct){
@@ -469,32 +511,47 @@ window.NO4 = window.NO4 || {};
           // the animated path) is a near-black frame + the DOM wordmark,
           // not pull_back's opening wide city shot.
           var isClosing = tl.act === 'closing';
-          var seg = isClosing ? actCue.segments[actCue.segments.length - 1] : actCue.segments[0];
-          var clip = CUES.clips[seg.clipId];
-          var img = new Image();
+          // curve acts (hero) have no `segments` to pick from — fall back to
+          // the curve's own last control point as the "first-ish frame"
+          // still. This whole picking scheme is provisional: design doc
+          // §7.1 replaces it with a curated, re-graded still per act — this
+          // is just enough to not crash until that pass lands.
+          var stClipId, stF1;
+          if(actCue.curve){
+            stClipId = actCue.clipId;
+            stF1 = actCue.curve[actCue.curve.length - 1].f;
+          } else {
+            var seg = isClosing ? actCue.segments[actCue.segments.length - 1] : actCue.segments[0];
+            stClipId = seg.clipId;
+            stF1 = seg.f1;
+          }
+          var clip = CUES.clips[stClipId];
+          var img = new Image(), request=++staticRequest;
           img.onload = function(){
+            if(request!==staticRequest)return;
             resize();
             ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cw, ch);
             var scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
             var dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
             ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+            document.documentElement.classList.add('gilded-ready');
             L.drawVignette(ctx, cw, ch, actCue.vignetteCenterY);
             if(isClosing) { ctx.fillStyle = 'rgba(0,0,0,0.85)'; ctx.fillRect(0, 0, cw, ch); }
           };
-          img.src = clip.path + '/lo/f_' + String(seg.f1).padStart(4, '0') + '.jpg';
+          img.src = clip.path + '/lo/f_' + String(stF1).padStart(4, '0') + '.jpg';
         }
       }
       if(NO4.filmOverlay) NO4.filmOverlay.update(tl);
     }
     window.addEventListener('scroll', poll, {passive:true});
-    window.addEventListener('resize', poll);
+    window.addEventListener('resize', function(){lastAct=null;poll();});
     poll();
   }
 
   if(tier === 'T0'){
     runStatic();
   } else {
-    requestAnimationFrame(draw);
+    schedule();
   }
 
   canvas.addEventListener('webglcontextlost', function(){ /* no-op: plain 2D context, never fires */ });
